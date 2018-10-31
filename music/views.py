@@ -1,11 +1,13 @@
-from django.views import  generic
+from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from django.shortcuts import render,redirect
-from django.contrib.auth import authenticate, login
-from django.views.generic import  View
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.views.generic import View
 from .models import Album
-from .form import UserForm
+from .form import UserForm, LoginForm
+
 
 class IndexView(generic.ListView):
     template_name = 'music/index.html'
@@ -65,6 +67,31 @@ class UserFormView(View):
 
 
 
+class LoginView(View):
+    form_class = LoginForm
+    template_name = 'music/login_form.html'
+
+    # display blank form
+    def get(self, request):
+        form = self.form_class(None)
+        return render(request, self.template_name, {'form': form})
+
+    # process form data
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    return redirect('music:index')
+        return render(request, self.template_name, {'form': form})
 
 
+class LogoutView(View):
 
+    def get(self,request):
+        logout(request)
+        return redirect('music:login')
