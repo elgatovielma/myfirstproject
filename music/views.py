@@ -3,7 +3,6 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 from django.views.generic import View
 from .models import Album
 from .form import UserForm, LoginForm
